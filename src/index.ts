@@ -1,16 +1,20 @@
 // Desc: Main entry point for the application
 import inquirer from "inquirer";
 import { pool, connectDB } from "./connection";
+import "./connection";
 
 // 
 (async () => {
-    // Connect to the database
+    // TO Connect to the database
     try {
         await connectDB();
         console.log("Connected to the database");
+    } catch (err:any) {
+        console.error('Error connecting to the database:', err.message);
+    }
 
-    //  makeSelection async function
-    const makeSelection = async () => {
+    //  makeASelection async function
+    const makeASelection = async () => {
         try {
             // Prompt the user to select an action
             const answers = await inquirer.prompt([
@@ -61,7 +65,7 @@ import { pool, connectDB } from "./connection";
             }
           } catch (err: any) {
             console.error('Error processing selection:', err.message);
-            makeSelection(); 
+            makeASelection(); 
           }
     };
 
@@ -84,31 +88,32 @@ import { pool, connectDB } from "./connection";
           const result = await pool.query(sql);
           console.log(result);
           console.table(result.rows);
-          makeSelection();
+          makeASelection();
         } catch (err:any) {
           console.error('Error retrieving employees:', err.message);
-          makeSelection();
+          makeASelection();
         }
       };
 
     //function to add employee
     const addEmployee = async () => {
         try {
-            // Query the database for roles and employees
+            // Query the database for roles
             const roles = await pool.query('SELECT * FROM role;');
-            const roleChoices = roles.rows.map(row => ({ name: row.title, value: row.id }));
+            const roleChoice = roles.rows.map((row: { title: string; id: number }) => ({
+                name: row.title, value: row.id 
+            }));
 
+            // Query the database for employees
             const employees = await pool.query('SELECT * FROM employee;');
-            const managers = employees.rows.map(emp => ({
+            const manager = employees.rows.map(emp => ({
             name: `${emp.first_name} ${emp.last_name}`,
             value: emp.id
             }));
-            managers.unshift({ name: 'None', value: null });
-        } catch (err:any) {
-            console.error('Error retrieving roles and employees:', err.message);
-            makeSelection();
-            return;
-        }
+
+            // Add a None option to the manager list
+            manager.unshift({ name: 'None', value: null });
+
 
         // Prompt the user for the new employee's information
         const answers = await inquirer.prompt([
@@ -126,13 +131,13 @@ import { pool, connectDB } from "./connection";
               type: 'list',
               name: 'employeeRole',
               message: "What is the employee's role?",
-              choices: roleChoices
+              choices: roleChoice
             },
             {
               type: 'list',
               name: 'employeeManager',
               message: "Who is the employee's manager?",
-              choices: managers
+              choices: manager
             }
           ]);
           
@@ -140,13 +145,11 @@ import { pool, connectDB } from "./connection";
           const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`;
             await pool.query(sql, [answers.employeeFirstName, answers.employeeLastName, answers.employeeRole, answers.employeeManager]);
             console.log(`${answers.employeeFirstName} ${answers.employeeLastName} added to the database.`);
-            makeSelection();
-            }
-            // Catch any errors
-        } catch (err: any) {
+                makeASelection();
+            } catch (err: any) {
             console.error('Error adding employee:', err.message);
-            
-            makeSelection();
+            makeASelection();
+        }
     };
 
 
@@ -184,10 +187,10 @@ import { pool, connectDB } from "./connection";
           const sql = 'UPDATE employee SET role_id = $1 WHERE id = $2';
           await pool.query(sql, [answers.employeeRole, answers.employeeSelect]);
           console.log(`Updated employee's role.`);
-          makeSelection();
+          makeASelection();
         } catch (err:any) {
           console.error('Error updating employee role:', err.message);
-          makeSelection();
+          makeASelection();
         }
       };
 
@@ -198,12 +201,12 @@ import { pool, connectDB } from "./connection";
           const sql = 'SELECT r.id, r.title, d.name AS department, r.salary FROM role r JOIN department d ON d.id = r.department_id;';
           const result = await pool.query(sql);
           console.table(result.rows);
-          makeSelection();
+          makeASelection();
 
           // Catch any errors
         } catch (err:any) {
           console.error('Error retrieving roles:', err.message);
-          makeSelection();
+          makeASelection();
         }
       };
 
@@ -225,7 +228,7 @@ import { pool, connectDB } from "./connection";
               type: 'input',
               name: 'roleSalary',
               message: 'What is the salary for the role?',
-              validate: value => !isNaN(value) ? true : 'Please enter a valid number'
+              validate: (value: number) => !isNaN(value) ? true : 'Please enter a valid number'
             },
             {
               type: 'list',
@@ -239,11 +242,11 @@ import { pool, connectDB } from "./connection";
           const sql = 'INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3)';
           await pool.query(sql, [answers.roleTitle, answers.roleSalary, answers.roleDepartment]);
           console.log(`Added role ${answers.roleTitle} to the database.`);
-          makeSelection();
+          makeASelection();
           // Catch any errors
         } catch (err:any) {
           console.error('Error adding role:', err.message);
-          makeSelection();
+          makeASelection();
         }
       };
 
@@ -254,11 +257,11 @@ import { pool, connectDB } from "./connection";
           const sql = 'SELECT * FROM department;';
           const result = await pool.query(sql);
           console.table(result.rows);
-          makeSelection();
+          makeASelection();
           // Catch any errors
         } catch (err:any) {
           console.error('Error retrieving departments:', err.message);
-          makeSelection();
+          makeASelection();
         }
       };
 
@@ -277,20 +280,20 @@ import { pool, connectDB } from "./connection";
           const sql = 'INSERT INTO department (name) VALUES ($1)';
           await pool.query(sql, [answers.departmentName]);
           console.log(`Added department ${answers.departmentName} to the database.`);
-          makeSelection();
+          makeASelection();
         } catch (err:any) {
           console.error('Error adding department:', err.message);
-          makeSelection();
+          makeASelection();
         }
       };  
 
 
      //start the application
-    makeSelection();
+    try {
+        makeASelection();
 
     } catch (err:any) {
         console.error('Error connecting to the database:', err.message);
-        process.exit(1);
-    }
-    })();
+    }   
+})();
 

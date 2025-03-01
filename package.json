@@ -1,5 +1,5 @@
 {
-    "name": "name_of_app_here",
+    "name": "employee_tracker",
     "version": "1.0.0",
     "description": "",
     "type": "module",
@@ -10,14 +10,15 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "dotenv": "^16.4.5",
-        "inquirer": "^8.2.4",
+        "dotenv": "^16.4.7",
+        "inquirer": "^8.2.6",
         "pg": "^8.13.3"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@types/dotenv": "^6.1.1",
         "@types/express": "^4.17.21",
         "@types/inquirer": "^9.0.7",
         "@types/pg": "^8.11.6",
