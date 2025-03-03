@@ -1,9 +1,9 @@
 // Purpose: Connection to the database.
-import * as dotenv from 'dotenv' 
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 // Import the pg module
-import * as pg from 'pg';
+import pg from 'pg';
 const { Pool } = pg;
 
 // Create a new pool
@@ -12,7 +12,7 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   host: 'localhost',
   database: process.env.DB_NAME,
-    port: 5432
+    port: 5432,
 });
 
 // Connect to the database

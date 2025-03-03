@@ -1,7 +1,6 @@
 // Desc: Main entry point for the application
-import inquirer from "inquirer";
-import { pool, connectDB } from "./connection";
-import "./connection";
+import inquirer from 'inquirer';
+import { pool, connectDB } from './connection.js';
 
 // 
 (async () => {
@@ -64,7 +63,7 @@ import "./connection";
                 process.exit(0);
             }
           } catch (err: any) {
-            console.error('Error processing selection:', err.message);
+            console.error('Error with selection:', err.message);
             makeASelection(); 
           }
     };
@@ -76,7 +75,7 @@ import "./connection";
             
             // Query the database
             const sql = `
-          
+        
             SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, 
                  CONCAT(m.first_name, ' ', m.last_name) as manager
           FROM employee e
