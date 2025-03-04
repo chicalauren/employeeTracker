@@ -30,3 +30,4 @@ View all departments, roles, and employees. Additionally, you can add a departme
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Link to a demo
+https://app.screencastify.com/v3/watch/JDpejEunhKUiNezaHmQI
