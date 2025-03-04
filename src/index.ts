@@ -78,10 +78,10 @@ import { pool, connectDB } from './connection.js';
         
             SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, 
                  CONCAT(m.first_name, ' ', m.last_name) as manager
-          FROM employee e
-          JOIN role r ON e.role_id = r.id
-          JOIN department d ON r.department_id = d.id
-          LEFT JOIN employee m ON e.manager_id = m.id;
+          FROM employees e
+          JOIN roles r ON e.role_id = r.id
+          JOIN departments d ON r.department_id = d.id
+          LEFT JOIN employees m ON e.manager_id = m.id;
           `;
         
           const result = await pool.query(sql);
@@ -98,13 +98,13 @@ import { pool, connectDB } from './connection.js';
     const addEmployee = async () => {
         try {
             // Query the database for roles
-            const roles = await pool.query('SELECT * FROM role;');
+            const roles = await pool.query('SELECT * FROM roles');
             const roleChoice = roles.rows.map((row: { title: string; id: number }) => ({
                 name: row.title, value: row.id 
             }));
 
             // Query the database for employees
-            const employees = await pool.query('SELECT * FROM employee;');
+            const employees = await pool.query('SELECT * FROM employees');
             const manager = employees.rows.map(emp => ({
             name: `${emp.first_name} ${emp.last_name}`,
             value: emp.id
@@ -141,12 +141,12 @@ import { pool, connectDB } from './connection.js';
           ]);
           
           // Insert the new employee into the database
-          const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`;
+          const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`;
             await pool.query(sql, [answers.employeeFirstName, answers.employeeLastName, answers.employeeRole, answers.employeeManager]);
             console.log(`${answers.employeeFirstName} ${answers.employeeLastName} added to the database.`);
                 makeASelection();
             } catch (err: any) {
-            console.error('Error adding employee:', err.message);
+            console.error('Error adding employees:', err.message);
             makeASelection();
         }
     };
@@ -156,14 +156,14 @@ import { pool, connectDB } from './connection.js';
     // Update an employee's role
     const updateEmployee = async () => {
         try {
-          const employees = await pool.query('SELECT * FROM employee;');
+          const employees = await pool.query('SELECT * FROM employees;');
           const employeeChoices = employees.rows.map(emp => ({
             name: `${emp.first_name} ${emp.last_name}`,
             value: emp.id
           }));
 
           // Query the database for roles
-          const roles = await pool.query('SELECT * FROM role;');
+          const roles = await pool.query('SELECT * FROM roles;');
           const roleChoices = roles.rows.map(row => ({ name: row.title, value: row.id }));
 
           // Prompt the user for the employee and role to update
@@ -183,12 +183,12 @@ import { pool, connectDB } from './connection.js';
           ]);
 
         // Update the employee's role
-          const sql = 'UPDATE employee SET role_id = $1 WHERE id = $2';
+          const sql = 'UPDATE employees SET role_id = $1 WHERE id = $2';
           await pool.query(sql, [answers.employeeRole, answers.employeeSelect]);
-          console.log(`Updated employee's role.`);
+          console.log(`Updated employee's roles.`);
           makeASelection();
         } catch (err:any) {
-          console.error('Error updating employee role:', err.message);
+          console.error('Error updating employees roles:', err.message);
           makeASelection();
         }
       };
@@ -197,7 +197,7 @@ import { pool, connectDB } from './connection.js';
      //function to view all roles
      const viewAllRoles = async () => {
         try {
-          const sql = 'SELECT r.id, r.title, d.name AS department, r.salary FROM role r JOIN department d ON d.id = r.department_id;';
+          const sql = 'SELECT r.id, r.title, d.name AS departments, r.salary FROM roles r JOIN departments d ON d.id = r.department_id;';
           const result = await pool.query(sql);
           console.table(result.rows);
           makeASelection();
@@ -213,7 +213,7 @@ import { pool, connectDB } from './connection.js';
     //function to add role
     const addRole = async () => {
         try {
-          const departments = await pool.query('SELECT * FROM department;');
+          const departments = await pool.query('SELECT * FROM departments;');
           const departmentChoices = departments.rows.map(row => ({ name: row.name, value: row.id }));
   
           // Prompt the user for the new role's information
@@ -238,7 +238,7 @@ import { pool, connectDB } from './connection.js';
           ]);
           
         // Insert the new role into the database
-          const sql = 'INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3)';
+          const sql = 'INSERT INTO roles (title, salary, department_id) VALUES ($1, $2, $3)';
           await pool.query(sql, [answers.roleTitle, answers.roleSalary, answers.roleDepartment]);
           console.log(`Added role ${answers.roleTitle} to the database.`);
           makeASelection();
@@ -253,7 +253,7 @@ import { pool, connectDB } from './connection.js';
      const viewAllDepartments = async () => {
         // Query the database
         try {
-          const sql = 'SELECT * FROM department;';
+          const sql = 'SELECT * FROM departments;';
           const result = await pool.query(sql);
           console.table(result.rows);
           makeASelection();
@@ -276,7 +276,7 @@ import { pool, connectDB } from './connection.js';
           ]);
 
           // Insert the new department into the database
-          const sql = 'INSERT INTO department (name) VALUES ($1)';
+          const sql = 'INSERT INTO departments (name) VALUES ($1)';
           await pool.query(sql, [answers.departmentName]);
           console.log(`Added department ${answers.departmentName} to the database.`);
           makeASelection();

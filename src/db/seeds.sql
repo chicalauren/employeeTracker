@@ -2,7 +2,7 @@
 \c employee_tracker
 
 -- Insert data into department table
-INSERT INTO department (name)
+INSERT INTO departments (name)
 
 VALUES ('Engineering'),
        ('Sales'),
@@ -10,7 +10,7 @@ VALUES ('Engineering'),
        ('Legal');
 
 -- Insert data into role table
-Insert INTO role
+Insert INTO roles
 (title, salary, department_id)
     VALUES ('Mechanical Engineer', 105000, 1),
            ('Electrical Engineer', 145000, 1),
@@ -20,13 +20,13 @@ Insert INTO role
            ('Executive', 120000, 3),
            ('Warehouse', 30000, 4);
 
--- Insert data into employee table
-INSERT INTO employee
+-- Insert data into employees table
+INSERT INTO employees
 (first_name, last_name, role_id, manager_id)
     VALUES ('Josh', 'Doe', 1, NULL),
            ('Jane', 'Doe', 2, 1),
            ('Jim', 'Doe', 3, 2),
-           ('Jill', 'Doe', 4, 3),
+           ('John', 'Doe', 4, 3),
            ('Jack', 'Doe', 5, 4),
            ('Jenny', 'Doe', 6, 5),
            ('Jared', 'Doe', 7, 6);
